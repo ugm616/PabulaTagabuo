@@ -204,21 +204,21 @@ button.active {
 }
 
 .tab-buttons button.active {
-    background-color: var (--text-color);
-    color: var (--bg-color);
-    border-bottom: 2px solid var (--bg-color);
+    background-color: var(--text-color);
+    color: var(--bg-color);
+    border-bottom: 2px solid var(--bg-color);
 }
 
 .tab-buttons button:not(.active) {
-    border-bottom: 2px solid var (--text-color);
+    border-bottom: 2px solid var(--text-color);
 }
 
 .node {
     position: absolute;
     width: 200px;
     height: 150px;
-    background-color: var (--highlight-color);
-    border: 1px solid var (--text-color);
+    background-color: var(--highlight-color);
+    border: 1px solid var(--text-color);
     border-radius: 5px;
     cursor: move; /* Add this to indicate draggable */
 }
@@ -226,7 +226,7 @@ button.active {
 .connector {
     width: 10px;
     height: 10px;
-    background-color: var (--text-color);
+    background-color: var(--text-color);
     border-radius: 50%;
     position: absolute;
 }
@@ -238,11 +238,11 @@ button.active {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    background-color: var (--bg-color);
-    border: 1px solid var (--text-color);
+    background-color: var(--bg-color);
+    border: 1px solid var(--text-color);
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 0 10px var (--glow-color);
+    box-shadow: 0 0 10px var(--glow-color);
 }
 
 .modal.active {
@@ -255,7 +255,7 @@ button.active {
     top: 40px;
     left: 0;
     right: 0;
-    background-color: var (--submenu-color); /* Slightly different shade */
+    background-color: var(--submenu-color); /* Slightly different shade */
     padding: 5px;
     z-index: 998; /* Behind options bar */
 }
