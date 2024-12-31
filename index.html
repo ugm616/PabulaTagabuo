@@ -59,17 +59,17 @@
 
         .toolbar {
             background-color: var(--highlight-color);
-            display: flex;
-            gap: 5px;
             padding: 5px;
+            height: 40px;
+            display: flex;
+            align-items: center;
         }
 
         .menu-bar {
             display: flex;
             justify-content: space-between;
-            height: 40px;
             align-items: center;
-            flex: 1;
+            width: 100%;
         }
 
         .quick-buttons {
@@ -157,8 +157,13 @@
             }
         }
 
-        .main-area {
+        .main-container {
+            display: flex;
             height: calc(100vh - 50px);
+        }
+
+        .main-area {
+            flex: 1;
             position: relative;
             overflow: hidden;
         }
@@ -185,6 +190,7 @@
             width: 300px;
             background-color: var(--highlight-color);
             font-size: 0.8em;
+            border-left: 1px solid var(--text-color);
         }
 
         .tab-buttons {
@@ -249,6 +255,13 @@
                 <button id="test-story" title="Test Story">Test Story</button>
             </div>
         </div>
+    </div>
+    <div class="main-container">
+        <div class="main-area">
+            <div class="grid-area" id="grid">
+                <!-- Nodes will be added here dynamically -->
+            </div>
+        </div>
         <div class="options-bar">
             <div class="tab-buttons">
                 <button class="active">Edit</button>
@@ -259,11 +272,6 @@
             <div class="tab-content">
                 <!-- Tab content will be loaded here -->
             </div>
-        </div>
-    </div>
-    <div class="main-area">
-        <div class="grid-area" id="grid">
-            <!-- Nodes will be added here dynamically -->
         </div>
     </div>
 
