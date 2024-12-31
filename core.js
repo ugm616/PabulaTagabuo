@@ -1,4 +1,3 @@
-// core.js
 class StoryNode {
     constructor(id, position) {
         this.id = id;
@@ -19,13 +18,13 @@ class StoryEditor {
         this.scale = 1;
         this.offset = { x: 0, y: 0 };
         this.selectedNode = null;
+        this.autosave = false;
         
         this.init();
     }
 
     init() {
         this.setupEventListeners();
-        this.setupThemeToggle();
         this.setupAutosave();
     }
 
@@ -63,6 +62,17 @@ class StoryEditor {
             this.scale = Math.min(Math.max(0.1, this.scale), 5);
             this.updateGridPosition();
         });
+
+        // Autosave toggle
+        const autosaveBtn = document.getElementById('autosave-toggle');
+        autosaveBtn.addEventListener('click', () => {
+            this.autosave = !this.autosave;
+            autosaveBtn.title = `Autosave: ${this.autosave ? 'On' : 'Off'}`;
+        });
+
+        // Save JSON
+        const saveBtn = document.getElementById('save-json');
+        saveBtn.addEventListener('click', () => this.saveToJson());
     }
 
     updateGridPosition() {
@@ -70,7 +80,12 @@ class StoryEditor {
         grid.style.transform = `translate(${this.offset.x}px, ${this.offset.y}px) scale(${this.scale})`;
     }
 
-    // JSON handling with encryption
+    setupAutosave() {
+        if (this.autosave) {
+            setInterval(() => this.saveToJson(), 30000); // Autosave every 30 seconds
+        }
+    }
+
     async saveToJson(password) {
         const data = {
             nodes: Array.from(this.nodes.values()),
@@ -101,6 +116,17 @@ class StoryEditor {
             };
         }
 
+        // Download JSON file
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'story.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
         return data;
     }
 }
