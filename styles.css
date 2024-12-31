@@ -184,6 +184,10 @@ button.active {
     background-color: var(--highlight-color);
     font-size: 0.8em;
     border-left: 1px solid var(--text-color);
+    position: absolute;
+    right: 0;
+    top: 40px; /* Below the toolbar */
+    bottom: 0;
 }
 
 .tab-buttons {
@@ -259,7 +263,7 @@ button.active {
     right: 0;
     background-color: var(--submenu-color); /* Slightly different shade */
     padding: 5px;
-    z-index: 998; /* Behind options bar */
+    z-index: 997; /* Behind options bar */
 }
 
 .submenu-bar button {
