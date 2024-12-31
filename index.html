@@ -67,6 +67,51 @@
             gap: 10px;
         }
 
+        #autosave-toggle {
+            background-image: url('assets/icons/autosave.png');
+        }
+
+        #theme-toggle {
+            background-image: url('assets/icons/theme.png');
+        }
+
+        #save-json {
+            background-image: url('assets/icons/save.png');
+        }
+
+        /* Fallback styles if images don't load */
+        #autosave-toggle::before {
+            content: '⟳';
+            font-size: 24px;
+}
+
+        #theme-toggle::before {
+            content: '◐';
+            font-size: 24px;
+        }
+
+        #save-json::before {
+    content: '↓';
+    font-size: 24px;
+        }
+
+        /* Override font-size: 0 when using fallback */
+            .quick-buttons button::before {
+                font-size: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .quick-buttons button::before {
+                font-size: 20px;
+             }   
+        }
+
+        @media (max-width: 480px) {
+            .quick-buttons button::before {
+                font-size: 16px;
+            }
+        }
+
         .quick-buttons button {
             display: flex;
             align-items: center;
