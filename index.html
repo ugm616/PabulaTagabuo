@@ -54,7 +54,7 @@
 
         button.active {
             background-color: var(--text-color);
-            color: var(--bg-color);
+            color: var (--bg-color);
         }
 
         .toolbar {
@@ -257,6 +257,25 @@
         .modal.active {
             display: block;
         }
+
+        .submenu-bar {
+            display: none;
+            position: absolute;
+            top: 40px;
+            left: 0;
+            right: 0;
+            background-color: var(--highlight-color);
+            padding: 5px;
+            z-index: 999;
+        }
+
+        .submenu-bar button {
+            margin: 0 5px;
+        }
+
+        .submenu-bar.active {
+            display: flex;
+        }
     </style>
 </head>
 <body>
@@ -273,6 +292,22 @@
                 <button id="test-story" title="Test Story">Test Story</button>
             </div>
         </div>
+    </div>
+    <div class="submenu-bar" id="file-submenu">
+        <button id="new-project">New Project</button>
+        <button id="save-project">Save Project</button>
+        <button id="open-project">Open Project</button>
+    </div>
+    <div class="submenu-bar" id="nodes-submenu">
+        <button id="start-node">Start Node</button>
+        <button id="text-node">Text Node</button>
+        <button id="image-node">Image Node</button>
+        <button id="youtube-node">YouTube Node</button>
+        <button id="tiktok-node">TikTok Node</button>
+        <button id="rumble-node">Rumble Node</button>
+        <button id="decision-node">Decision Node</button>
+        <button id="item-node">Item Node</button>
+        <button id="custom-node">Custom Node</button>
     </div>
     <div class="main-container">
         <div class="main-area">
@@ -293,28 +328,13 @@
         </div>
     </div>
 
-    <!-- Modal for File Menu -->
-    <div id="file-modal" class="modal">
-        <h2>File Menu</h2>
-        <button id="new-project">New Project</button>
-        <button id="save-project">Save Project</button>
-        <button id="open-project">Open Project</button>
-        <button id="close-file-modal">Close</button>
-    </div>
-
-    <!-- Modal for Nodes Menu -->
-    <div id="nodes-modal" class="modal">
-        <h2>Nodes Menu</h2>
-        <button id="start-node">Start Node</button>
-        <button id="text-node">Text Node</button>
-        <button id="image-node">Image Node</button>
-        <button id="youtube-node">YouTube Node</button>
-        <button id="tiktok-node">TikTok Node</button>
-        <button id="rumble-node">Rumble Node</button>
-        <button id="decision-node">Decision Node</button>
-        <button id="item-node">Item Node</button>
-        <button id="custom-node">Custom Node</button>
-        <button id="close-nodes-modal">Close</button>
+    <!-- Modal for Save Project Confirmation -->
+    <div id="save-project-modal" class="modal">
+        <h2>Save Project</h2>
+        <p>Do you want to save your progress before starting a new project?</p>
+        <button id="confirm-save">Yes</button>
+        <button id="cancel-save">No</button>
+        <button id="close-save-modal">Cancel</button>
     </div>
 
     <script src="core.js"></script>
@@ -406,56 +426,61 @@
             });
         });
 
-        // File menu modal
+        // File menu and sub-menu
         const fileMenu = document.getElementById('file-menu');
-        const fileModal = document.getElementById('file-modal');
-        const closeFileModal = document.getElementById('close-file-modal');
+        const fileSubmenu = document.getElementById('file-submenu');
         fileMenu.addEventListener('click', () => {
-            fileModal.classList.add('active');
-        });
-        closeFileModal.addEventListener('click', () => {
-            fileModal.classList.remove('active');
+            fileSubmenu.classList.toggle('active');
         });
 
-        // Nodes menu modal
+        // Nodes menu and sub-menu
         const nodesMenu = document.getElementById('nodes-menu');
-        const nodesModal = document.getElementById('nodes-modal');
-        const closeNodesModal = document.getElementById('close-nodes-modal');
+        const nodesSubmenu = document.getElementById('nodes-submenu');
         nodesMenu.addEventListener('click', () => {
-            nodesModal.classList.add('active');
-        });
-        closeNodesModal.addEventListener('click', () => {
-            nodesModal.classList.remove('active');
+            nodesSubmenu.classList.toggle('active');
         });
 
         // New Project
         const newProjectBtn = document.getElementById('new-project');
+        const saveProjectModal = document.getElementById('save-project-modal');
+        const confirmSaveBtn = document.getElementById('confirm-save');
+        const cancelSaveBtn = document.getElementById('cancel-save');
+        const closeSaveModalBtn = document.getElementById('close-save-modal');
+
         newProjectBtn.addEventListener('click', () => {
-            if (confirm('Do you want to save your progress before starting a new project?')) {
-                editor.saveToJson().then(() => {
-                    editor.nodes.clear();
-                    editor.connections = [];
-                    fileModal.classList.remove('active');
-                });
-            } else {
+            saveProjectModal.classList.add('active');
+        });
+
+        confirmSaveBtn.addEventListener('click', () => {
+            editor.saveToJson().then(() => {
                 editor.nodes.clear();
                 editor.connections = [];
-                fileModal.classList.remove('active');
-            }
+                saveProjectModal.classList.remove('active');
+            });
+        });
+
+        cancelSaveBtn.addEventListener('click', () => {
+            editor.nodes.clear();
+            editor.connections = [];
+            saveProjectModal.classList.remove('active');
+        });
+
+        closeSaveModalBtn.addEventListener('click', () => {
+            saveProjectModal.classList.remove('active');
         });
 
         // Save Project
         const saveProjectBtn = document.getElementById('save-project');
         saveProjectBtn.addEventListener('click', () => {
             editor.saveToJson();
-            fileModal.classList.remove('active');
+            fileSubmenu.classList.remove('active');
         });
 
         // Open Project
         const openProjectBtn = document.getElementById('open-project');
         openProjectBtn.addEventListener('click', () => {
             editor.loadFromJson();
-            fileModal.classList.remove('active');
+            fileSubmenu.classList.remove('active');
         });
 
         // Make nodes draggable
