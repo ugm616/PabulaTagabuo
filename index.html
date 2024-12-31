@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pabula Tagabuo</title>
+    <title>Story Node Editor</title>
     <link href="https://fonts.googleapis.com/css2?family=Aldrich&display=swap" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Aldrich&display=swap');
@@ -32,13 +32,14 @@
             background-color: var(--highlight-color);
             color: var(--text-color);
             border: 1px solid var(--text-color);
-            padding: 8px 16px;
+            padding: 4px 12px;
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.3s ease;
-            min-width: 80px;
+            min-width: 60px;
             text-align: center;
             margin: 2px;
+            font-size: 0.9em;
         }
 
         button:hover {
@@ -58,13 +59,28 @@
         .menu-bar {
             display: flex;
             justify-content: space-between;
-            padding: 10px;
+            padding: 5px;
+            height: 40px;
             background-color: var(--highlight-color);
+            align-items: center;
         }
 
         .quick-buttons {
             display: flex;
             gap: 10px;
+        }
+
+        .quick-buttons button {
+            width: 40px;
+            height: 40px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-size: 30px;
+            background-position: center;
+            background-repeat: no-repeat;
+            font-size: 0;
         }
 
         #autosave-toggle {
@@ -79,71 +95,46 @@
             background-image: url('assets/icons/save.png');
         }
 
-        /* Fallback styles if images don't load */
         #autosave-toggle::before {
             content: '⟳';
-            font-size: 24px;
-}
+            font-size: 20px;
+        }
 
         #theme-toggle::before {
             content: '◐';
-            font-size: 24px;
+            font-size: 20px;
         }
 
         #save-json::before {
-    content: '↓';
-    font-size: 24px;
-        }
-
-        /* Override font-size: 0 when using fallback */
-            .quick-buttons button::before {
-                font-size: 24px;
-        }
-
-        @media (max-width: 768px) {
-            .quick-buttons button::before {
-                font-size: 20px;
-             }   
-        }
-
-        @media (max-width: 480px) {
-            .quick-buttons button::before {
-                font-size: 16px;
-            }
-        }
-
-        .quick-buttons button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 60px;
-            height: 60px;
-            padding: 10px;
-            background-size: 30px;
-            background-position: center;
-            background-repeat: no-repeat;
-            font-size: 0;
+            content: '↓';
+            font-size: 20px;
         }
 
         @media (max-width: 768px) {
             .quick-buttons button {
-                width: 40px;
-                height: 40px;
-                background-size: 20px;
+                width: 35px;
+                height: 35px;
+            }
+            
+            .quick-buttons button::before {
+                font-size: 18px;
             }
         }
 
         @media (max-width: 480px) {
             .quick-buttons button {
-                width: 30px;
-                height: 30px;
-                background-size: 15px;
+                width: 25px;
+                height: 25px;
+            }
+            
+            .quick-buttons button::before {
+                font-size: 14px;
             }
         }
 
         .main-area {
             display: flex;
-            height: calc(100vh - 50px);
+            height: calc(100vh - 40px);
         }
 
         .grid-area {
@@ -163,15 +154,15 @@
         .tab-buttons {
             display: flex;
             gap: 2px;
-            padding: 10px;
+            padding: 5px 10px;
             border-bottom: 2px solid var(--text-color);
         }
 
         .tab-buttons button {
             flex: 1;
             min-width: 60px;
-            font-size: 0.8em;
-            padding: 8px 12px;
+            font-size: 0.75em;
+            padding: 6px 10px;
             border-radius: 4px 4px 0 0;
             border: 1px solid var(--text-color);
             border-bottom: none;
