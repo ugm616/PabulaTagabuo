@@ -19,7 +19,6 @@ class StoryEditor {
         this.offset = { x: 0, y: 0 };
         this.selectedNode = null;
         this.autosave = false;
-        this.connections = [];
         
         this.init();
     }
@@ -151,7 +150,7 @@ class StoryEditor {
         });
 
         // Make nodes draggable
-        function makeNodeDraggable(node) {
+        makeNodeDraggable(node) {
             let offsetX, offsetY;
             node.addEventListener('mousedown', (e) => {
                 offsetX = e.clientX - node.getBoundingClientRect().left;
@@ -161,7 +160,7 @@ class StoryEditor {
                     document.removeEventListener('mousemove', moveNode);
                 }, { once: true });
             });
-
+    
             function moveNode(e) {
                 node.style.left = `${e.clientX - offsetX}px`;
                 node.style.top = `${e.clientY - offsetY}px`;
@@ -175,60 +174,8 @@ class StoryEditor {
         exampleNode.style.top = '100px';
         grid.appendChild(exampleNode);
         makeNodeDraggable(exampleNode);
-
-        // Add nodes from the nodes menu
-        const nodes = {
-            'start-node': { color: '#FFFFFF', type: 'Start Node' },
-            'text-node': { color: '#FFFFFF', type: 'Text Node' },
-            'image-node': { color: '#CCCCCC', type: 'Image Node' },
-            'youtube-node': { color: '#FF0000', type: 'YouTube Node' },
-            'tiktok-node': { color: '#00FFFF', type: 'TikTok Node' },
-            'rumble-node': { color: '#008000', type: 'Rumble Node' },
-            'decision-node': { color: '#FF0000', type: 'Decision Node' },
-            'item-node': { color: '#FFD700', type: 'Item Node' },
-            'custom-node': { color: '#FFFFFF', type: 'Custom Node' }
-        };
-
-        Object.keys(nodes).forEach(nodeId => {
-            const nodeBtn = document.getElementById(nodeId);
-            nodeBtn.addEventListener('click', () => {
-                const nodeData = nodes[nodeId];
-                const newNode = document.createElement('div');
-                newNode.className = 'node';
-                newNode.style.backgroundColor = nodeData.color;
-                newNode.innerHTML = `<strong>${nodeData.type}</strong>`;
-                grid.appendChild(newNode);
-                makeNodeDraggable(newNode);
-                nodesSubmenu.classList.remove('active');
-            });
-        });
     }
 
-    updateGridPosition() {
-        const grid = document.getElementById('grid');
-        const visualX = this.offset.x % 20;
-        const visualY = this.offset.y % 20;
-        grid.style.setProperty('--x', visualX + 'px');
-        grid.style.setProperty('--y', visualY + 'px');
-        grid.style.transform = `translate(${this.offset.x}px, ${this.offset.y}px) scale(${this.scale})`;
-    }
-
-    setupAutosave() {
-        if (this.autosave) {
-            setInterval(() => this.saveToJson(), 30000); // Autosave every 30 seconds
-        }
-    }
-
-    /**
-     * Saves the current story nodes and connections to a JSON file.
-     * If a password is provided, the data will be encrypted.
-     * @param {string} [password] - Optional password for encrypting the JSON data.
-     * @returns {Promise<Object>} - The saved data or encrypted data.
-    async saveToJson(password) {
-        if (password && !crypto.subtle) {
-            console.error('Web Crypto API is not supported in this environment.');
-            return;
-        }
     async saveToJson(password) {
         const data = {
             nodes: Array.from(this.nodes.values()),
@@ -247,6 +194,65 @@ class StoryEditor {
                 ['encrypt']
             );
             const iv = crypto.getRandomValues(new Uint8Array(12));
+            const encrypted = await crypto.subtle.encrypt(
+                { name: 'AES-GCM', iv },
+                key,
+                dataBuffer
+            );
+            
+            return {
+                encrypted: Array.from(new Uint8Array(encrypted)),
+                iv: Array.from(iv)
+            };
+        }
+
+        // Download JSON file
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'story.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        return data;
+    }
+
+    async loadFromJson(password) {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'application/json';
+        input.onchange = async (e) => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                const content = event.target.result;
+                let data;
+                if (password) {
+                    const encryptedData = JSON.parse(content);
+                    const keyBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password));
+                    const key = await crypto.subtle.importKey(
+                        'raw',
+                        keyBuffer,
+                        { name: 'AES-GCM' },
+                        false,
+                        ['decrypt']
+                    );
+                    const decrypted = await crypto.subtle.decrypt(
+                        { name: 'AES-GCM', iv: new Uint8Array(encryptedData.iv) },
+                        key,
+                        new Uint8Array(encryptedData.encrypted)
+                    );
+                    data = JSON.parse(new TextDecoder().decode(decrypted));
+                } else {
+                    data = JSON.parse(content);
+                }
+                this.nodes = new Map(data.nodes.map(node => [node.id, node]));
+                this.connections = data.connections;
+                // Update the UI with loaded data
+class StoryNode {
     constructor(id, position) {
         this.id = id;
         this.position = position;
@@ -422,93 +428,121 @@ class StoryEditor {
         exampleNode.style.top = '100px';
         grid.appendChild(exampleNode);
         makeNodeDraggable(exampleNode);
-
-        // Add nodes from the nodes menu
-        const nodes = {
-            'start-node': { color: '#FFFFFF', type: 'Start Node' },
-            'text-node': { color: '#FFFFFF', type: 'Text Node' },
-            'image-node': { color: '#CCCCCC', type: 'Image Node' },
-            'youtube-node': { color: '#FF0000', type: 'YouTube Node' },
-            'tiktok-node': { color: '#00FFFF', type: 'TikTok Node' },
-            'rumble-node': { color: '#008000', type: 'Rumble Node' },
-            'decision-node': { color: '#FF0000', type: 'Decision Node' },
-            'item-node': { color: '#FFD700', type: 'Item Node' },
-            'custom-node': { color: '#FFFFFF', type: 'Custom Node' }
-        };
-
-        Object.keys(nodes).forEach(nodeId => {
-            const nodeBtn = document.getElementById(nodeId);
-            nodeBtn.addEventListener('click', () => {
-                const nodeData = nodes[nodeId];
-                const newNode = document.createElement('div');
-                newNode.className = 'node';
-                newNode.style.backgroundColor = nodeData.color;
-                newNode.innerHTML = `<strong>${nodeData.type}</strong>`;
-                grid.appendChild(newNode);
-                makeNodeDraggable(newNode);
-                nodesSubmenu.classList.remove('active');
-            });
-        });
-    }
-
-    updateGridPosition() {
-        const grid = document.getElementById('grid');
-        const visualX = this.offset.x % 20;
-        const visualY = this.offset.y % 20;
-        grid.style.setProperty('--x', visualX + 'px');
-        grid.style.setProperty('--y', visualY + 'px');
-        grid.style.transform = `translate(${this.offset.x}px, ${this.offset.y}px) scale(${this.scale})`;
-    }
-
-    setupAutosave() {
-        if (this.autosave) {
-            setInterval(() => this.saveToJson(), 30000); // Autosave every 30 seconds
-        }
     }
 
     async saveToJson(password) {
-        const data = this.getData();
-
-        if (password) {
-            return await this.encryptData(data, password);
-        }
-
-        this.downloadJson(data);
-        return data;
-    }
-
-    getData() {
-        return {
+        const data = {
             nodes: Array.from(this.nodes.values()),
             connections: this.connections
         };
+
+        if (password) {
+            const encoder = new TextEncoder();
+            const dataBuffer = encoder.encode(JSON.stringify(data));
+            const keyBuffer = await crypto.subtle.digest('SHA256', encoder.encode(password));
+            const key = await crypto.subtle.importKey(
+                'raw',
+                keyBuffer,
+                { name: 'AES-GCM' },
+                false,
+                ['encrypt']
+            );
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+            const encrypted = await crypto.subtle.encrypt(
+                { name: 'AES-GCM', iv },
+                key,
+                dataBuffer
+            );
+            
+            return {
+                encrypted: Array.from(new Uint8Array(encrypted)),
+                iv: Array.from(iv)
+            };
+        }
+
+        // Download JSON file
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = documentElement('a');
+        a.href = url;
+        a.download = 'story.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        return data;
     }
 
-    async encryptData(data, password) {
-        const encoder = new TextEncoder();
-        const dataBuffer = encoder.encode(JSON.stringify(data));
-        const keyBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(password));
-        const key = await crypto.subtle.importKey(
-            'raw',
-            keyBuffer,
-            { name: 'AES-GCM' },
-            false,
-            ['encrypt']
-        );
-        const iv = crypto.getRandomValues(new Uint8Array(12));
-        const encrypted = await crypto.subtle.encrypt(
-            { name: 'AES-GCM', iv },
-            key,
-            dataBuffer
-        );
-
-        return {
-            encrypted: Array.from(new Uint8Array(encrypted)),
-            iv: Array.from(iv)
+    async loadFromJson(password) {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'application/json';
+        input.onchange = async (e) => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                const content = event.target.result;
+                let data;
+                if (password) {
+                    const encryptedData = JSON.parse(content);
+                    const keyBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password));
+                    const key = await crypto.subtle.importKey(
+                        'raw',
+                        keyBuffer,
+                        { name: 'AES-GCM' },
+                        false,
+                        ['decrypt']
+                    );
+                    const decrypted = await crypto.subtle.decrypt(
+                        { name: 'AES-GCM', iv: new Uint8Array(encryptedData.iv) },
+                        key,
+                        new Uint8Array(encryptedData.encrypted)
+                    );
+                    data = JSON.parse(new TextDecoder().decode(decrypted));
+                } else {
+                    data = JSON.parse(content);
+                }
+                this.nodes = new Map(data.nodes.map(node => [node.id, node]));
+                this.connections = data.connections;
+                // Update the UI with loaded data
+            };
+            reader.readAsText(file);
         };
+        input.click();
     }
-
-    downloadJson(data) {
+    
+    async saveToJson(password) {
+        const data = {
+            nodes: Array.from(this.nodes.values()),
+            connections: this.connections
+        };
+    
+        if (password) {
+            const encoder = new TextEncoder();
+            const dataBuffer = encoder.encode(JSON.stringify(data));
+            const keyBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(password));
+            const key = await crypto.subtle.importKey(
+                'raw',
+                keyBuffer,
+                { name: 'AES-GCM' },
+                false,
+                ['encrypt']
+            );
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+            const encrypted = await crypto.subtle.encrypt(
+                { name: 'AES-GCM', iv },
+                key,
+                dataBuffer
+            );
+            
+            return {
+                encrypted: Array.from(new Uint8Array(encrypted)),
+                iv: Array.from(iv)
+            };
+        }
+    
+        // Download JSON file
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -518,46 +552,35 @@ class StoryEditor {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+        
+        return data;
     }
     
-        async loadFromJson(password) {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'application/json';
-            input.onchange = async (e) => {
-                const file = e.target.files[0];
-                const reader = new FileReader();
-                reader.onload = async (event) => {
-                    const content = event.target.result;
-                    let data;
-                    if (password) {
-                        const encryptedData = JSON.parse(content);
-                        const keyBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password));
-                        const key = await crypto.subtle.importKey(
-                            'raw',
-                            keyBuffer,
-                            { name: 'AES-GCM' },
-                            false,
-                            ['decrypt']
-                        );
-                        const decrypted = await crypto.subtle.decrypt(
-                            { name: 'AES-GCM', iv: new Uint8Array(encryptedData.iv) },
-                            key,
-                            new Uint8Array(encryptedData.encrypted)
-                        );
-                        data = JSON.parse(new TextDecoder().decode(decrypted));
-                    } else {
-                        data = JSON.parse(content);
-                    }
-                    this.nodes = new Map(data.nodes.map(node => [node.id, node]));
-                    this.connections = data.connections;
-                    // Update the UI with loaded data
-                };
-                reader.readAsText(file);
-            };
-            input.click();
+    // Make nodes draggable
+    function makeNodeDraggable(node) {
+        let offsetX, offsetY;
+        node.addEventListener('mousedown', (e) => {
+            offsetX = e.clientX - node.getBoundingClientRect().left;
+            offsetY = e.clientY - node.getBoundingClientRect().top;
+            document.addEventListener('mousemove', moveNode);
+            document.addEventListener('mouseup', () => {
+                document.removeEventListener('mousemove', moveNode);
+            }, { once: true });
+        });
+    
+        function moveNode(e) {
+            node.style.left = `${e.clientX - offsetX}px`;
+            node.style.top = `${e.clientY - offsetY}px`;
         }
     }
+    
+    // Example of adding a node and making it draggable
+    const exampleNode = document.createElement('div');
+    exampleNode.className = 'node';
+    exampleNode.style.left = '100px';
+    exampleNode.style.top = '100px';
+    document.getElementById('grid').appendChild(exampleNode);
+    makeNodeDraggable(exampleNode);
     
     // Initialize the editor
     const editor = new StoryEditor();
