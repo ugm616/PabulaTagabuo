@@ -217,7 +217,7 @@
         </div>
         <div class="options-bar">
             <div class="tab-buttons">
-                <button>Edit</button>
+                <button class="active">Edit</button>
                 <button>Chapter</button>
                 <button>Inventory</button>
                 <button>NPC</button>
@@ -227,5 +227,53 @@
             </div>
         </div>
     </div>
+
+    <script src="core.js"></script>
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        const root = document.documentElement;
+
+        const lightTheme = {
+            bgColor: '#DDDDDD',
+            highlightColor: '#AAAAAA',
+            textColor: '#333333'
+        };
+
+        const darkTheme = {
+            bgColor: '#222222',
+            highlightColor: '#555555',
+            textColor: '#CCCCCC'
+        };
+
+        let isDarkMode = true;
+
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            const theme = isDarkMode ? darkTheme : lightTheme;
+            
+            root.style.setProperty('--bg-color', theme.bgColor);
+            root.style.setProperty('--highlight-color', theme.highlightColor);
+            root.style.setProperty('--text-color', theme.textColor);
+            
+            themeToggle.title = `Switch to ${isDarkMode ? 'Light' : 'Dark'} Mode`;
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+        }
+
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            isDarkMode = savedTheme === 'dark';
+            toggleTheme();
+        }
+
+        themeToggle.addEventListener('click', toggleTheme);
+
+        const tabButtons = document.querySelectorAll('.tab-buttons button');
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+            });
+        });
+    </script>
 </body>
 </html>
