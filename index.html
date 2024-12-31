@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Story Node Editor</title>
+    <title>Pabula Tagabuo</title>
     <link href="https://fonts.googleapis.com/css2?family=Aldrich&display=swap" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Aldrich&display=swap');
@@ -12,6 +12,7 @@
             --bg-color: #222222;
             --highlight-color: #555555;
             --text-color: #CCCCCC;
+            --glow-color: #00ffff;
         }
 
         body {
@@ -87,12 +88,25 @@
             background-image: url('assets/icons/autosave.png');
         }
 
+        #autosave-toggle.active {
+            border-color: var(--glow-color);
+            box-shadow: 0 0 10px var(--glow-color);
+        }
+
+        #autosave-toggle.active::before {
+            color: var(--glow-color);
+        }
+
         #theme-toggle {
             background-image: url('assets/icons/theme.png');
         }
 
         #save-json {
             background-image: url('assets/icons/save.png');
+        }
+
+        #test-story {
+            background-image: url('assets/icons/test.png');
         }
 
         #autosave-toggle::before {
@@ -107,6 +121,11 @@
 
         #save-json::before {
             content: '↓';
+            font-size: 20px;
+        }
+
+        #test-story::before {
+            content: '▶';
             font-size: 20px;
         }
 
@@ -209,6 +228,7 @@
             <button id="autosave-toggle" title="Autosave: Off">Autosave</button>
             <button id="theme-toggle" title="Toggle Theme">Theme</button>
             <button id="save-json" title="Download JSON">Save</button>
+            <button id="test-story" title="Test Story">Test Story</button>
         </div>
     </div>
     <div class="main-area">
@@ -219,7 +239,7 @@
             <div class="tab-buttons">
                 <button class="active">Edit</button>
                 <button>Chapter</button>
-                <button>Inventory</button>
+                <button>Items</button>
                 <button>NPC</button>
             </div>
             <div class="tab-content">
@@ -231,6 +251,7 @@
     <script src="core.js"></script>
     <script>
         const themeToggle = document.getElementById('theme-toggle');
+        const autosaveToggle = document.getElementById('autosave-toggle');
         const root = document.documentElement;
 
         const lightTheme = {
@@ -266,6 +287,9 @@
         }
 
         themeToggle.addEventListener('click', toggleTheme);
+        autosaveToggle.addEventListener('click', () => {
+            autosaveToggle.classList.toggle('active');
+        });
 
         const tabButtons = document.querySelectorAll('.tab-buttons button');
         tabButtons.forEach(button => {
