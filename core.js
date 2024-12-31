@@ -62,17 +62,6 @@ class StoryEditor {
             this.scale = Math.min(Math.max(0.1, this.scale), 5);
             this.updateGridPosition();
         });
-
-        // Autosave toggle
-        const autosaveBtn = document.getElementById('autosave-toggle');
-        autosaveBtn.addEventListener('click', () => {
-            this.autosave = !this.autosave;
-            autosaveBtn.title = `Autosave: ${this.autosave ? 'On' : 'Off'}`;
-        });
-
-        // Save JSON
-        const saveBtn = document.getElementById('save-json');
-        saveBtn.addEventListener('click', () => this.saveToJson());
     }
 
     updateGridPosition() {
@@ -82,7 +71,7 @@ class StoryEditor {
 
     setupAutosave() {
         if (this.autosave) {
-            setInterval(() => this.saveToJson(), 30000); // Autosave every 30 seconds
+            setInterval(() => this.saveToJson(), 30000);
         }
     }
 
@@ -116,7 +105,6 @@ class StoryEditor {
             };
         }
 
-        // Download JSON file
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -131,5 +119,4 @@ class StoryEditor {
     }
 }
 
-// Initialize the editor
 const editor = new StoryEditor();
