@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Node Editor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Aldrich&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #222222;
+            --highlight-color: #555555;
+            --text-color: #CCCCCC;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Aldrich', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .menu-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: var(--highlight-color);
+        }
+
+        .quick-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .main-area {
+            display: flex;
+            height: calc(100vh - 50px);
+        }
+
+        .grid-area {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background-image: linear-gradient(var(--highlight-color) 1px, transparent 1px),
+                             linear-gradient(90deg, var(--highlight-color) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .options-bar {
+            width: 300px;
+            background-color: var(--highlight-color);
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 5px;
+            padding: 10px;
+        }
+
+        .node {
+            position: absolute;
+            width: 200px;
+            height: 150px;
+            background-color: var(--highlight-color);
+            border: 1px solid var(--text-color);
+            border-radius: 5px;
+        }
+
+        .connector {
+            width: 10px;
+            height: 10px;
+            background-color: var(--text-color);
+            border-radius: 50%;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-bar">
+        <div class="menu-buttons">
+            <button>File</button>
+            <button>Edit</button>
+            <button>View</button>
+        </div>
+        <div class="quick-buttons">
+            <button id="autosave-toggle">Autosave: Off</button>
+            <button id="theme-toggle">Light Mode</button>
+            <button id="save-json">Download JSON</button>
+        </div>
+    </div>
+    <div class="main-area">
+        <div class="grid-area" id="grid">
+            <!-- Nodes will be added here dynamically -->
+        </div>
+        <div class="options-bar">
+            <div class="tab-buttons">
+                <button>Edit</button>
+                <button>Chapter</button>
+                <button>Inventory</button>
+                <button>NPC</button>
+            </div>
+            <div class="tab-content">
+                <!-- Tab content will be loaded here -->
+            </div>
+        </div>
+    </div>
+</body>
+</html>
