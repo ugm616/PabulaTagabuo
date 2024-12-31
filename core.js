@@ -59,7 +59,7 @@ class StoryEditor {
             e.preventDefault();
             const delta = e.deltaY > 0 ? 0.9 : 1.1;
             const newScale = this.scale * delta;
-            if (newScale >= 0.5 && newScale <= 3.0) {
+            if (newScale >= 1.0 && newScale <= 3.0) {
                 this.scale = newScale;
                 this.updateGridPosition();
             }
