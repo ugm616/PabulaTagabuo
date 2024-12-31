@@ -1,13 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Aldrich&display=swap');
-
-:root {
-    --bg-color: #222222;
-    --highlight-color: #555555;
-    --text-color: #CCCCCC;
-    --glow-color: #00ffff;
-    --submenu-color: #666666; /* Slightly different shade for sub-menu */
-}
-
 body {
     margin: 0;
     padding: 0;
@@ -56,6 +46,8 @@ button.active {
     height: 40px;
     display: flex;
     align-items: center;
+    z-index: 1000; /* Ensure toolbar is on top */
+    position: relative;
 }
 
 .menu-bar {
@@ -184,10 +176,8 @@ button.active {
     background-color: var(--highlight-color);
     font-size: 0.8em;
     border-left: 1px solid var(--text-color);
-    position: absolute;
-    right: 0;
-    top: 40px; /* Below the toolbar */
-    bottom: 0;
+    z-index: 998; /* Ensure options bar is above submenu */
+    position: relative;
 }
 
 .tab-buttons {
@@ -216,7 +206,7 @@ button.active {
 }
 
 .tab-buttons button:not(.active) {
-    border-bottom: 2px solid var(--text-color);
+    border-bottom: 2px solid var (--text-color);
 }
 
 .node {
