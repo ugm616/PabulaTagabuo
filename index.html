@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Story Node Editor</title>
+    <title>Pabula Tagabuo</title>
     <link href="https://fonts.googleapis.com/css2?family=Aldrich&display=swap" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Aldrich&display=swap');
@@ -20,6 +20,11 @@
             font-family: 'Aldrich', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
+            overflow: hidden;
+        }
+
+        ::-webkit-scrollbar {
+            display: none;
         }
 
         button {
@@ -65,17 +70,30 @@
         .quick-buttons button {
             display: flex;
             align-items: center;
-            gap: 5px;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            padding: 10px;
+            background-size: 30px;
+            background-position: center;
+            background-repeat: no-repeat;
+            font-size: 0;
         }
 
-        .quick-buttons button::before {
-            content: '';
-            width: 16px;
-            height: 16px;
-            display: inline-block;
-            background-size: contain;
-            background-repeat: no-repeat;
-            vertical-align: middle;
+        @media (max-width: 768px) {
+            .quick-buttons button {
+                width: 40px;
+                height: 40px;
+                background-size: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .quick-buttons button {
+                width: 30px;
+                height: 30px;
+                background-size: 15px;
+            }
         }
 
         .main-area {
@@ -99,13 +117,31 @@
 
         .tab-buttons {
             display: flex;
-            gap: 5px;
+            gap: 2px;
             padding: 10px;
+            border-bottom: 2px solid var(--text-color);
         }
 
         .tab-buttons button {
             flex: 1;
             min-width: 60px;
+            font-size: 0.8em;
+            padding: 8px 12px;
+            border-radius: 4px 4px 0 0;
+            border: 1px solid var(--text-color);
+            border-bottom: none;
+            position: relative;
+            margin-bottom: -2px;
+        }
+
+        .tab-buttons button.active {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            border-bottom: 2px solid var(--bg-color);
+        }
+
+        .tab-buttons button:not(.active) {
+            border-bottom: 2px solid var(--text-color);
         }
 
         .node {
@@ -134,9 +170,9 @@
             <button>View</button>
         </div>
         <div class="quick-buttons">
-            <button id="autosave-toggle">Autosave: Off</button>
-            <button id="theme-toggle">Light Mode</button>
-            <button id="save-json">Download JSON</button>
+            <button id="autosave-toggle" title="Autosave: Off">Autosave</button>
+            <button id="theme-toggle" title="Toggle Theme">Theme</button>
+            <button id="save-json" title="Download JSON">Save</button>
         </div>
     </div>
     <div class="main-area">
