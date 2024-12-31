@@ -13,6 +13,7 @@
             --highlight-color: #555555;
             --text-color: #CCCCCC;
             --glow-color: #00ffff;
+            --submenu-color: #666666; /* Slightly different shade for sub-menu */
         }
 
         body {
@@ -54,7 +55,7 @@
 
         button.active {
             background-color: var(--text-color);
-            color: var (--bg-color);
+            color: var(--bg-color);
         }
 
         .toolbar {
@@ -159,7 +160,7 @@
 
         .main-container {
             display: flex;
-            height: calc(100vh - 50px);
+            height: calc(100vh - 90px); /* Adjust height to account for toolbar and submenu */
         }
 
         .main-area {
@@ -264,9 +265,9 @@
             top: 40px;
             left: 0;
             right: 0;
-            background-color: var(--highlight-color);
+            background-color: var(--submenu-color); /* Slightly different shade */
             padding: 5px;
-            z-index: 999;
+            z-index: 998; /* Behind options bar */
         }
 
         .submenu-bar button {
@@ -429,15 +430,27 @@
         // File menu and sub-menu
         const fileMenu = document.getElementById('file-menu');
         const fileSubmenu = document.getElementById('file-submenu');
-        fileMenu.addEventListener('click', () => {
+        fileMenu.addEventListener('click', (e) => {
+            e.stopPropagation();
             fileSubmenu.classList.toggle('active');
         });
 
         // Nodes menu and sub-menu
         const nodesMenu = document.getElementById('nodes-menu');
         const nodesSubmenu = document.getElementById('nodes-submenu');
-        nodesMenu.addEventListener('click', () => {
+        nodesMenu.addEventListener('click', (e) => {
+            e.stopPropagation();
             nodesSubmenu.classList.toggle('active');
+        });
+
+        // Hide sub-menus when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!fileMenu.contains(e.target) && !fileSubmenu.contains(e.target)) {
+                fileSubmenu.classList.remove('active');
+            }
+            if (!nodesMenu.contains(e.target) && !nodesSubmenu.contains(e.target)) {
+                nodesSubmenu.classList.remove('active');
+            }
         });
 
         // New Project
