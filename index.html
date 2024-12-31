@@ -163,6 +163,8 @@
             background-image: linear-gradient(var(--highlight-color) 1px, transparent 1px),
                              linear-gradient(90deg, var(--highlight-color) 1px, transparent 1px);
             background-size: 20px 20px;
+            background-position: var(--x, 0) var(--y, 0);
+            background-attachment: local;
         }
 
         .options-bar {
@@ -254,6 +256,9 @@
         const themeToggle = document.getElementById('theme-toggle');
         const autosaveToggle = document.getElementById('autosave-toggle');
         const root = document.documentElement;
+        const grid = document.getElementById('grid');
+        let lastX = 0;
+        let lastY = 0;
 
         const lightTheme = {
             bgColor: '#DDDDDD',
@@ -269,6 +274,13 @@
 
         let isDarkMode = true;
 
+        function updateGridPosition() {
+            const x = (lastX % 20); // 20px is grid size
+            const y = (lastY % 20);
+            grid.style.setProperty('--x', x + 'px');
+            grid.style.setProperty('--y', y + 'px');
+        }
+
         function toggleTheme() {
             isDarkMode = !isDarkMode;
             const theme = isDarkMode ? darkTheme : lightTheme;
@@ -281,15 +293,26 @@
             localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
         }
 
+        // Load saved theme
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme) {
             isDarkMode = savedTheme === 'dark';
             toggleTheme();
         }
 
+        // Event Listeners
         themeToggle.addEventListener('click', toggleTheme);
+        
         autosaveToggle.addEventListener('click', () => {
             autosaveToggle.classList.toggle('active');
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (editor && editor.isDragging) {
+                lastX = (lastX + e.movementX) % 20;
+                lastY = (lastY + e.movementY) % 20;
+                updateGridPosition();
+            }
         });
 
         const tabButtons = document.querySelectorAll('.tab-buttons button');
