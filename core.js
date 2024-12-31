@@ -58,20 +58,41 @@ class StoryEditor {
         grid.addEventListener('wheel', (e) => {
             e.preventDefault();
             const delta = e.deltaY > 0 ? 0.9 : 1.1;
-            this.scale *= delta;
-            this.scale = Math.min(Math.max(0.1, this.scale), 5);
-            this.updateGridPosition();
+            const newScale = this.scale * delta;
+            if (newScale >= 0.5 && newScale <= 3.0) {
+                this.scale = newScale;
+                this.updateGridPosition();
+            }
         });
+
+        // Autosave toggle
+        const autosaveBtn = document.getElementById('autosave-toggle');
+        autosaveBtn.addEventListener('click', () => {
+            this.autosave = !this.autosave;
+            autosaveBtn.title = `Autosave: ${this.autosave ? 'On' : 'Off'}`;
+        });
+
+        // Save JSON
+        const saveBtn = document.getElementById('save-json');
+        saveBtn.addEventListener('click', () => this.saveToJson());
+
+        // Load JSON
+        const loadBtn = document.getElementById('load-json');
+        loadBtn.addEventListener('click', () => this.loadFromJson());
     }
 
     updateGridPosition() {
         const grid = document.getElementById('grid');
+        const visualX = this.offset.x % 20;
+        const visualY = this.offset.y % 20;
+        grid.style.setProperty('--x', visualX + 'px');
+        grid.style.setProperty('--y', visualY + 'px');
         grid.style.transform = `translate(${this.offset.x}px, ${this.offset.y}px) scale(${this.scale})`;
     }
 
     setupAutosave() {
         if (this.autosave) {
-            setInterval(() => this.saveToJson(), 30000);
+            setInterval(() => this.saveToJson(), 30000); // Autosave every 30 seconds
         }
     }
 
@@ -105,6 +126,7 @@ class StoryEditor {
             };
         }
 
+        // Download JSON file
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -117,6 +139,45 @@ class StoryEditor {
         
         return data;
     }
+
+    async loadFromJson(password) {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'application/json';
+        input.onchange = async (e) => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                const content = event.target.result;
+                let data;
+                if (password) {
+                    const encryptedData = JSON.parse(content);
+                    const keyBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password));
+                    const key = await crypto.subtle.importKey(
+                        'raw',
+                        keyBuffer,
+                        { name: 'AES-GCM' },
+                        false,
+                        ['decrypt']
+                    );
+                    const decrypted = await crypto.subtle.decrypt(
+                        { name: 'AES-GCM', iv: new Uint8Array(encryptedData.iv) },
+                        key,
+                        new Uint8Array(encryptedData.encrypted)
+                    );
+                    data = JSON.parse(new TextDecoder().decode(decrypted));
+                } else {
+                    data = JSON.parse(content);
+                }
+                this.nodes = new Map(data.nodes.map(node => [node.id, node]));
+                this.connections = data.connections;
+                // Update the UI with loaded data
+            };
+            reader.readAsText(file);
+        };
+        input.click();
+    }
 }
 
+// Initialize the editor
 const editor = new StoryEditor();
