@@ -178,7 +178,7 @@
             background-image: linear-gradient(var(--highlight-color) 1px, transparent 1px),
                              linear-gradient(90deg, var(--highlight-color) 1px, transparent 1px);
             background-size: 20px 20px;
-            background-position: var(--x, 0) var(--y, 0);
+            background-position: var(--x, 0) var (--y, 0);
             background-attachment: local;
             padding: 100vh 100vw;
             margin: -100vh -100vw;
@@ -238,15 +238,32 @@
             border-radius: 50%;
             position: absolute;
         }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--bg-color);
+            border: 1px solid var(--text-color);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px var(--glow-color);
+        }
+
+        .modal.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
     <div class="toolbar">
         <div class="menu-bar">
             <div class="menu-buttons">
-                <button>File</button>
-                <button>Edit</button>
-                <button>View</button>
+                <button id="file-menu">File</button>
+                <button id="nodes-menu">Nodes</button>
             </div>
             <div class="quick-buttons">
                 <button id="autosave-toggle" title="Autosave: Off">Autosave</button>
@@ -273,6 +290,30 @@
                 <!-- Tab content will be loaded here -->
             </div>
         </div>
+    </div>
+
+    <!-- Modal for File Menu -->
+    <div id="file-modal" class="modal">
+        <h2>File Menu</h2>
+        <button id="new-project">New Project</button>
+        <button id="save-project">Save Project</button>
+        <button id="open-project">Open Project</button>
+        <button id="close-file-modal">Close</button>
+    </div>
+
+    <!-- Modal for Nodes Menu -->
+    <div id="nodes-modal" class="modal">
+        <h2>Nodes Menu</h2>
+        <button id="start-node">Start Node</button>
+        <button id="text-node">Text Node</button>
+        <button id="image-node">Image Node</button>
+        <button id="youtube-node">YouTube Node</button>
+        <button id="tiktok-node">TikTok Node</button>
+        <button id="rumble-node">Rumble Node</button>
+        <button id="decision-node">Decision Node</button>
+        <button id="item-node">Item Node</button>
+        <button id="custom-node">Custom Node</button>
+        <button id="close-nodes-modal">Close</button>
     </div>
 
     <script src="core.js"></script>
@@ -305,7 +346,7 @@
             grid.style.setProperty('--y', visualY + 'px');
 
             // Apply scale with limits
-            const scale = Math.min(Math.max(editor.scale, 0.5), 3.0);
+            const scale = Math.min(Math.max(editor.scale, 1.0), 3.0);
             grid.style.transform = `scale(${scale})`;
         }
 
@@ -349,7 +390,7 @@
             if (editor) {
                 const delta = e.deltaY > 0 ? 0.9 : 1.1;
                 const newScale = editor.scale * delta;
-                if (newScale >= 0.5 && newScale <= 3.0) {
+                if (newScale >= 1.0 && newScale <= 3.0) {
                     editor.scale = newScale;
                     updateGridPosition();
                 }
@@ -362,6 +403,58 @@
                 tabButtons.forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
             });
+        });
+
+        // File menu modal
+        const fileMenu = document.getElementById('file-menu');
+        const fileModal = document.getElementById('file-modal');
+        const closeFileModal = document.getElementById('close-file-modal');
+        fileMenu.addEventListener('click', () => {
+            fileModal.classList.add('active');
+        });
+        closeFileModal.addEventListener('click', () => {
+            fileModal.classList.remove('active');
+        });
+
+        // Nodes menu modal
+        const nodesMenu = document.getElementById('nodes-menu');
+        const nodesModal = document.getElementById('nodes-modal');
+        const closeNodesModal = document.getElementById('close-nodes-modal');
+        nodesMenu.addEventListener('click', () => {
+            nodesModal.classList.add('active');
+        });
+        closeNodesModal.addEventListener('click', () => {
+            nodesModal.classList.remove('active');
+        });
+
+        // New Project
+        const newProjectBtn = document.getElementById('new-project');
+        newProjectBtn.addEventListener('click', () => {
+            if (confirm('Do you want to save your progress before starting a new project?')) {
+                editor.saveToJson().then(() => {
+                    editor.nodes.clear();
+                    editor.connections = [];
+                    fileModal.classList.remove('active');
+                });
+            } else {
+                editor.nodes.clear();
+                editor.connections = [];
+                fileModal.classList.remove('active');
+            }
+        });
+
+        // Save Project
+        const saveProjectBtn = document.getElementById('save-project');
+        saveProjectBtn.addEventListener('click', () => {
+            editor.saveToJson();
+            fileModal.classList.remove('active');
+        });
+
+        // Open Project
+        const openProjectBtn = document.getElementById('open-project');
+        openProjectBtn.addEventListener('click', () => {
+            editor.loadFromJson();
+            fileModal.classList.remove('active');
         });
     </script>
 </body>
